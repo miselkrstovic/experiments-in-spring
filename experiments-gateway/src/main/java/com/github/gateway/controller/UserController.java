@@ -40,31 +40,34 @@ public class UserController {
 	@PostMapping("/users")
 	public ResponseEntity<Void> add(@RequestHeader("host") String hostName, @RequestBody User user) {
 		try {
-			String id = proxy.performAdd(user);
-		
-			StringBuilder sb = new StringBuilder();
-			String location;
-			
-			RequestAttributes reqAttributes = RequestContextHolder.currentRequestAttributes();
-			String lookupPath = reqAttributes.getAttribute(LOOKUP_PATH, 0).toString();
-			if (lookupPath != null && !lookupPath.isEmpty()) {
-				if (hostName != null && !hostName.isEmpty()) {
-					sb.append("http://");  // TODO: Remove this static string!
-					sb.append(hostName);			
-				}
-				sb.append(lookupPath);
-			}
-			
-			sb.append(id);
-			location = sb.toString();
-			
+			String resourceId = proxy.performAdd(user);
+				
 			MultiValueMap<String, String> headers = new HttpHeaders();
-			headers.add("Location", location);
+			headers.add("Location", generateLocationUri(hostName, resourceId));
 			
 			return new ResponseEntity<>(headers, HttpStatus.CREATED);
 		} catch (AmqpException ex) {
 			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
 		}
+	}
+	
+	private String generateLocationUri(String hostName, String resourceId) {		
+		RequestAttributes reqAttributes = RequestContextHolder.currentRequestAttributes();
+		String lookupPath = reqAttributes.getAttribute(LOOKUP_PATH, 0).toString();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		if (lookupPath != null && !lookupPath.isEmpty()) {
+			if (hostName != null && !hostName.isEmpty()) {
+				sb.append("http://");  // TODO: Remove this static string!
+				sb.append(hostName);			
+			}
+			sb.append(lookupPath);
+		}
+		
+		sb.append(resourceId);
+		
+		return sb.toString();
 	}
 
 	@PutMapping("/users/{userId}")
@@ -96,13 +99,18 @@ public class UserController {
 	}
 	
 	@GetMapping("/users")
-	public List<User> list(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+	public ResponseEntity<List<User>> list(@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "sort", defaultValue = "") String sort,
 			@RequestParam(value = "order", defaultValue = "") String order) {
 		try {
-			return proxy.performSearch(keyword, sort, order);
+			List<User> users = proxy.performSearch(keyword, sort, order);
+			if (users != null) {
+				return ResponseEntity.ok(users);
+			} else {
+				return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+			}
 		} catch (AmqpException ex) {
-			return null;
+			return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
 		}
 	}
 	
