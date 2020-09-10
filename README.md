@@ -3,7 +3,7 @@
 
 This project is a personal exploration in a microservices based architecture that uses [Spring Boot](https://spring.io/projects/spring-boot), [RabbitMQ](https://www.rabbitmq.com/), and [MongoDB](https://www.mongodb.com/).
 
-The implemented solution provides an HTTP accessible [RESTful API](https://blog.octo.com/en/design-a-rest-api/) gateway, and a backend service that is responsible for persistence and management of data records.
+The implemented solution provides an HTTP accessible [RESTful](https://blog.octo.com/en/design-a-rest-api/) API gateway, and a backend service that is responsible for persistence and management of data records.
 
 # Design Decision
 
@@ -15,11 +15,11 @@ Since the whole goal of this exercise is to explore and demonstrate knowledge of
 
 The system components include an **API gateway**, a **backend service**, a **persistence engine**, and a **message broker**.
 
-The **API gateway** is responsible for providing (and exposing) a set of user management operations (CRUD-like), where there operations is executed on another service, and the result is communicated back in a synchronous [request/reply messaging](https://www.enterpriseintegrationpatterns.com/patterns/messaging/toc.html) manner. Another approach would of have been the use of Remoting over RabbitMQ, but the idea was abandoned in favor of a more loosely coupled design (aka request/reply messaging).
+The **API gateway** is responsible for providing (and exposing) a set of [CRUD-like](https://en.wikipedia.org/wiki/Create%2C_read%2C_update_and_delete) user management operations, where their operations are executed on another service and the result is communicated back in a synchronous [request/reply messaging](https://www.enterpriseintegrationpatterns.com/patterns/messaging/toc.html) manner. Another approach would of have been the use of [Remoting over RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-six-java.html), but the idea was abandoned in favor of a more loosely coupled design (aka request/reply messaging).
 
-Best practices regarding designing a [RESTful API](https://blog.octo.com/en/design-a-rest-api/) system were both followed and applied, such as versioning, resource collections, searching, sorting, and error handling. Plural form is used for resource collection naming.
+Best practices regarding designing a [RESTful](https://blog.octo.com/en/design-a-rest-api/) system were both followed and applied. Such as versioning, resource collections, searching, sorting/ordering, and error handling. Plural form is used all through out for resource collections naming.
 
-**Backend service** was designed to implement the RabbitMQ request/reply listeners, that interacts with the MongoDB database, using the Spring Data MongoDB (repository pattern). Also, the use of UUID was favored, due to its distributed friendly support for unique object id.
+**Backend service** was designed to implement the RabbitMQ request/reply listeners, which in turn interacts with the MongoDB database using the Spring Data MongoDB (repository pattern). Also, the use of UUIDs was favored, due to its distributed-friendly support for unique object ids.
 
 Both MongoDB **persistence engine** and RabbitMQ **message broker** are deployed on a **Docker system** with their default settings unchanged.
 
@@ -34,13 +34,13 @@ Both MongoDB **persistence engine** and RabbitMQ **message broker** are deployed
 
 **Unit tests**: Due to lack of time and high ambitions, the unit tests were not written, yet. **;-)**
 
-**Integration Tests**: In addition to unit tests, the parts of the system will need to be tested as a whole using [Cucumber](https://cucumber.io/) based automated testing tools.
+**Integration Tests**: In addition to unit tests, all parts of the system will need to be tested as a whole using [Cucumber](https://cucumber.io/)-based automated testing tools.
 
-**Spring Profiles**: Having two profiles helps in creating system flavors, since in an actual software development scenarios there will exist the need for both a development and a production deployment. In live production we can safely limit logging, enable actuators, and disable the devtools.
+**Spring Profiles**: Having two profiles helps in creating system flavors, since in an actual software development scenarios, there will exist the need for both a development and a production deployment. In live production deployments we can safely minimize logging, enable actuators, and disable devtools.
 
-**Security**: Applying either rudimentary white-listing to allow certain systems to communicate with the API gatewayo, or the introduction of Spring Security and OAuth. Also, SSL security needs to be enabled, with certificate generation and secure endpoint enforcement.
+**Security**: Applying either rudimentary white-listing to allow certain systems to communicate with the API gateway, or the introduction of Spring Security and OAuth is a necessity. Also, SSL security needs to be enabled, with certificate generation and secure endpoint enforcement.
 
-**Logging**: Logs from all systems should be standardized and sent to a central logging server, to aid with network management systems, for the sake of health and incident monitoring.
+**Logging**: Logs from all systems should be standardized and sent to a central logging system, as such to aid with network operations management systems, for the sake of health and incident monitoring.
 
 # Structure
 
@@ -54,7 +54,6 @@ experiments-in-spring
  +---experiments-gateway/
  +---experiments-service/
  +---LICENSE.md
- +---PROJECT.pdf
  \---README.md
 ```
 
@@ -62,7 +61,7 @@ experiments-in-spring
 
 In this section a detailed api usage is provided, with sufficient information on what endpoints are there, their http operations, path variables, request parameters, body, and expected responses.
 
-Instead of **curl** commands, provided is a [Postam](https://www.postman.com/) collection file that should be imported and utilized for invoking all available methods.
+Instead of providing **curl** commands, an alternative method is provided as a [Postman](https://www.postman.com/) collection, that can be imported and utilized for invoking all the available methods/operations.
 
 The RESTful API can be accessed with the below provided endpoint address:
 ````
@@ -80,7 +79,7 @@ class User {
 }
 ```
 
-In summary the supported HTTP operations are as follows:
+In summary, the supported HTTP operations are as follows:
 ````
 GET /v1/users/
 GET /v1/users/{userId}
@@ -109,9 +108,9 @@ Path Variable:<br>
 _none_
 
 Request Parameters:<br>
-**keyword** - a case-insensitive search keyword, used in a start-with searching algorithm.
+**keyword** - a case-insensitive search keyword, that uses a "start-with" matching algorithm.
 
-**sort** - a single key that designates comma separated field names with which to perform sorting on, of the allowable field names "firstName", "surname", "dateOfBirth", "creationDate". If an illegal or no value is specified, than the default is "creationDate".
+**sort** - a single key that designates comma-separated field names, with which to perform sorting on. Field names are restriced to the allowable field names: "firstName", "surname", "dateOfBirth", "creationDate". If an illegal value, or no value at all is specified, than the default is set to "creationDate".
 
 **order** - defines the sorting order whether it is _ascending_ or _descending_. Only two values are permitted here, and has to be one of "asc", or "desc". By default "asc" is set.
 
@@ -178,7 +177,7 @@ Response:<br>
 _none_
 
 Note:<br>
-_Upon successful addition of a user to the system, a "location" header will be provide an id of the created collection resource._
+_Upon successful addition of a user to the system, an http header field, designated as "location", will be added to provide an id of the created resource._
 
 #### Update a user
 ````
@@ -253,13 +252,13 @@ or
 
 The system requires the installation and presence of both a [Docker](https://www.docker.com/products/docker-desktop) container system, and a bash shell.
 
-MongoDB and RabbitMQ are installed using the following docker commands:
+Both MongoDB and RabbitMQ are installed using the following docker commands:
 ````shell
 $ docker pull mongo
 $ docker pull rabbitmq:3.8.8-management
 ````
 
-[MongoDB Compass](https://www.mongodb.com/try/download/compass) is used for management of MongoDB, as for RabbitMQ, its management console can be accessed at [http://localhost:15672/](http://localhost:15672/), using the _guest/guest_ as credentials.
+[MongoDB Compass](https://www.mongodb.com/try/download/compass) is used for management of MongoDB, as for RabbitMQ, its management console can be accessed at [http://localhost:15672/](http://localhost:15672/), using _guest/guest_ as credentials.
 
 # Running
 
