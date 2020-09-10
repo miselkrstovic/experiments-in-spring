@@ -3,19 +3,16 @@ package com.github.gateway.service;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gateway.configuration.RabbitConfig;
 import com.github.gateway.domain.Search;
 import com.github.gateway.domain.User;
 
-@Component
+@Service
 public class UserManagementService {
 
 	@Autowired

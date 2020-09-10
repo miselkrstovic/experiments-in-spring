@@ -16,13 +16,13 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.github.service.domain.Search;
 import com.github.service.domain.User;
 import com.github.service.repository.UserRepository;
 
-@Component
+@Service
 public class UserManagementService {
 
 	@Autowired
