@@ -80,12 +80,31 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (AmqpException ex) {
 			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
-		}	
+		}
 	}
 
 	@GetMapping("/users/{userId}")
-	public User retrieve(@PathVariable String userId) {
-		return proxy.performRetrieve(userId);
+	public ResponseEntity<User> retrieve(@PathVariable String userId) {
+		try {
+			if (userId != null) {
+				try {
+					UUID.fromString(userId);
+					
+					User user = proxy.performRetrieve(userId);
+					if (user != null) {
+						return ResponseEntity.ok(user);
+					} else {
+						return new ResponseEntity<>(HttpStatus.NOT_FOUND);	
+					}
+				} catch (IllegalArgumentException iax) {
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				}
+			} else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		} catch (AmqpException ex) {
+			return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+		}
 	}
 	
 	@DeleteMapping("/users/{userId}")

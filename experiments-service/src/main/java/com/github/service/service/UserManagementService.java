@@ -64,9 +64,13 @@ public class UserManagementService {
 	@RabbitListener(bindings = {@QueueBinding(value = @Queue(value = "user.retrieve.request"), exchange = @Exchange("experiments.services"), key="user.retrieve")})
 	public User retrieve(String userId) {
 		if (userId != null && !userId.isEmpty()) {
-			UUID uuid = UUID.fromString(userId);
-			if (repository.existsById(uuid)) {
-				return repository.findById(uuid).get();
+			try {
+				UUID uuid = UUID.fromString(userId);
+				if (repository.existsById(uuid)) {
+					return repository.findById(uuid).get();
+				}
+			} catch (IllegalArgumentException ex) {
+				return null;
 			}
 		}
 		return null;

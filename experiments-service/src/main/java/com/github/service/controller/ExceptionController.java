@@ -18,7 +18,7 @@ public class ExceptionController implements ErrorController {
 	@ResponseBody
 	public String getErrorPath() {
 		try {
-			return new ObjectMapper().writeValueAsString(new Error());
+			return new ObjectMapper().writeValueAsString(new Error("An unhandled error has occurred."));
 		} catch (JsonProcessingException e) {
 			return "{}";
 		}
